@@ -1,0 +1,64 @@
+<application>
+
+    <name> iCubPersonRecognition </name>
+
+    <!-->
+    MODULES.
+    <!-->
+    <module>
+        <name> PersonRecognition </name>
+        <parameters>  </parameters>
+        <node> localhost </node>
+    </module>
+
+    <module>
+        <name> MOT_yarp </name>
+        <parameters>  </parameters>
+        <node> icubsrv </node>
+    </module>
+
+    <module>
+        <name> objectDetector </name>
+        <parameters>  </parameters>
+        <node> icub-titan </node>
+    </module>
+
+    <module>
+        <name> objectsPropertiesCollector </name>
+        <parameters> </parameters>
+        <node> localhost </node>
+    </module>
+
+    <!-->
+    Altre dipendenze: camera eyes
+    <!-->
+
+
+
+    <!-->
+    CONNECTIONS.
+    <!-->
+
+
+    <connection>
+        <from> /MOT_yarp/trackers:o  </from>
+        <to>  /personRecognition/coord:i </to>
+        <protocol> tcp </protocol>
+    </connection>
+
+    <connection>
+        <from> /PersonRecognition/OPC:rpc  </from>
+        <to> /objectsPropertiesCollector/rpc  </to>
+        <protocol> tcp </protocol>
+    </connection>
+
+
+    <connection>
+        <from> /icub/camcalib/left/out  </from>
+        <to> /PersonRecognition/image:i </to>
+        <protocol> tcp </protocol>
+    </connection>
+
+
+
+</application>
