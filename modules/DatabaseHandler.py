@@ -17,8 +17,11 @@ class DatabaseHandler(object):
 
     def _add_face(self, name: str, img_face: np.ndarray, emb_face: list):
         face_dir = os.path.join("face", name)
+        print("face_dir is:", face_dir)
         if not self._check_dir_exist(face_dir):
-            os.mkdir(os.path.join(self.root_dir, face_dir))
+            new_dir = os.path.join(self.root_dir, face_dir)
+            os.mkdir(new_dir)
+            print("creating folder", new_dir)
 
         img_filename = str(datetime.timestamp(datetime.now())).replace('.', '_')
         filename_img = os.path.join(self.root_dir, face_dir,  (img_filename + ".jpg"))

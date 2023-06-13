@@ -26,23 +26,12 @@ class EmbeddingsHandler:
         self.name_dict = {}
         # self.filename_dict = {}
         self.n_neighbors = n_neighbors
-        # self.list_files = list_files
-        # self.emb_folder = emb_folder
-        # if self.list_files:
-        #     self.list_target = list_target
-        #     self.target_dict = target_dict
-        #     self._load_dataset_with_list()
-        # else:
         self._load_dataset()
         self.threshold = threshold
-
-        # self.pos_dist = []
-        # self.neg_dist = []
         self.excluded_entities = []
         # euclidean distance is a direct measure of similarity (faces of the same person have small distances)
         self.similarity_func = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
         # self.similarity_func = torch.cdist(x1, x2, p=2)
-        # self.path_unknown_val = "/home/icub/PycharmProjects/SpeakerRecognitionYarp/data/unknown_aligned/unknown"
 
     def _load_dataset(self):
         """
@@ -61,10 +50,40 @@ class EmbeddingsHandler:
             # self.filename_dict[s] = emb_filenames
             self.name_dict[label_id] = s
 
+    def get_distance_from_user(self, emb, identity_to_check):
+        max_dist = -1
 
-    def get_speaker_db_scan(self, emb_val, y_val, thr=None):
+        if identity_to_check in self.data_dict.keys():
+            for person_emb in self.data_dict[identity_to_check]:
+                dist = self.similarity_func(torch.from_numpy(person_emb), emb).numpy()
+                if dist[0] > max_dist:
+                    max_dist = dist[0]
 
-        distances, labels = self.get_max_distances(emb_val, y_val, thr)
+            return max_dist
+        return False
+
+
+    def get_max_distances(self, emb, thr):
+        if thr is None:
+            thr = self.threshold
+        list_distance = []
+        label_list = []
+        print("Data dictionary size {}".format(len(self.data_dict)))
+        for speaker_label, list_emb in self.data_dict.items():
+            # if speaker_label not in self.excluded_entities:
+            for person_emb in list_emb:
+                person_emb = torch.from_numpy(person_emb).unsqueeze(0)  #.cuda()
+                #dist = self.similarity_func(torch.from_numpy(person_emb), emb).numpy()
+                dist = torch.cdist(person_emb, emb).item()  #.numpy()
+                if dist < thr:
+                    list_distance.append(dist)
+                    label_list.append(speaker_label)
+
+        return list_distance, label_list
+
+
+    def get_speaker_db_scan(self, emb, thr=None):
+        distances, labels = self.get_max_distances(emb, thr)
         if len(distances) == 0:
             return -1, -1
 
@@ -89,7 +108,7 @@ class EmbeddingsHandler:
                     final_label = key
 
             #self.excluded_entities.append(final_label)
-            return max_dist/max_count, final_label, pos, neg
+            return max_dist/max_count, final_label
 
         except Exception as e:
             return -1, -1
@@ -115,7 +134,6 @@ class EmbeddingsHandler:
         return min_score, final_label
 
     def create_embeddings(self, encoder, trans):
-
         dirs = os.listdir(self.root_dir)
 
         # trans = transforms.Compose([
@@ -141,8 +159,9 @@ class EmbeddingsHandler:
 
 
 if __name__ == '__main__':
-    OUTPUT_EMB_TRAIN = "/home/icub/PycharmProjects/SpeakerRecognitionYarp/data/dataset_emb/train"
-    speaker_emb = EmbeddingsHandler(OUTPUT_EMB_TRAIN)
-    print(speaker_emb.name_dict)
+    pass
+    # OUTPUT_EMB_TRAIN = "/home/icub/PycharmProjects/SpeakerRecognitionYarp/data/dataset_emb/train"
+    # speaker_emb = EmbeddingsHandler(OUTPUT_EMB_TRAIN)
+    # print(speaker_emb.name_dict)
 
 

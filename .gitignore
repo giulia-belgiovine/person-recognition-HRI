@@ -3,3 +3,4 @@ build
 src/__pycache__/
 .DS_Store
 modules/TestModels
+modules/__pycache__/
