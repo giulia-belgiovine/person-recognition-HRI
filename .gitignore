@@ -4,3 +4,4 @@ build
 modules/TestModels
 modules/__pycache__/
 modules/faceRecognition/__pycache__/
+database/

@@ -1,6 +1,6 @@
 <application>
 
-    <name> iCubPersonRecognition </name>
+    <name> PersonRecognition </name>
 
     <!-->
     MODULES.
@@ -11,17 +11,6 @@
         <node> localhost </node>
     </module>
 
-    <module>
-        <name> MOT_yarp </name>
-        <parameters>  </parameters>
-        <node> icubsrv </node>
-    </module>
-
-    <module>
-        <name> objectDetector </name>
-        <parameters>  </parameters>
-        <node> icub-titan </node>
-    </module>
 
     <module>
         <name> objectsPropertiesCollector </name>
@@ -30,7 +19,7 @@
     </module>
 
     <!-->
-    Altre dipendenze: camera eyes
+    Altre dipendenze: camera eyes, MOT_yarp, objectDetector
     <!-->
 
 
@@ -42,7 +31,7 @@
 
     <connection>
         <from> /MOT_yarp/trackers:o  </from>
-        <to>  /personRecognition/coord:i </to>
+        <to>  /PersonRecognition/coord:i </to>
         <protocol> tcp </protocol>
     </connection>
 
